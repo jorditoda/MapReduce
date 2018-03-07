@@ -29,10 +29,10 @@ def add(paraula):
 
 if __name__ == "__main__":
 
-    f = open ("sherlock.txt")
+    #f = open ("sherlock.txt")
     #f = open ("Quijote.txt")
     #f = open ("bible.txt")
-    #f = open ("fitxeroProva.txt")
+    f = open ("fitxeroProva.txt")
     diccionari = {}
 
     for line in f.readlines():

@@ -30,7 +30,7 @@ if __name__ == "__main__":
     contador = 0
 
     for line in f:
-        for paraula in line.split(' '):
+        for paraula in line.split():
             paraula = puntuation(paraula)
             
             if(paraula.find(" ")>=0):
