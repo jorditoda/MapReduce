@@ -50,12 +50,14 @@ class Word(object):
 
         return contador
 
-    def add(self, paraula):
+    def add(self, paraula, diccionari):
         if (paraula not in diccionari):
             diccionari[paraula] = 1
         else:
             aux = diccionari[paraula]
             diccionari[paraula] = aux+1
+
+        return diccionari
 
     def countWord(self, fitxer, inici, fi):
         f = open (fitxer)
@@ -71,10 +73,10 @@ class Word(object):
                 
                     if(paraula.find(" ")>=0):
                         for p in paraula.split():
-                            self.add(p)
+                            diccionari = self.add(p, diccionari)
 
                     else:
-                        self.add(paraula)
+                        diccionari = self.add(paraula, diccionari)
 
             contadorLinia +=1
         f.close()
@@ -85,12 +87,29 @@ class Word(object):
 if __name__ == "__main__":
     set_context()
     host = create_host('http://127.0.0.1:1679')
+    fitxer = "sherlock.txt"
+    contadorLinia = 0
 
-    remote_host = host.lookup_url('http://127.0.0.1:1278/', Host)
-    print remote_host
-    server = remote_host.spawn('server', 'Master/Word')
+    f = open (fitxer, 'r')
+
+    contadorLinia = (len(f.readlines()))
+
+    f.close()
+
+    if (contadorLinia %2 ==1):
+        contadorLinia+=1
+
+    remote_host1 = host.lookup_url('http://127.0.0.1:1278/', Host)
+    remote_host2 = host.lookup_url('http://127.0.0.1:1279/', Host)
+    #print remote_host
+    mapper1 = remote_host1.spawn('mapper1', 'Master/Word')
+    mapper2 = remote_host2.spawn('mapper2', 'Master/Word')
+
+
     
-    print server.wordCount("fitxeroProva.txt", 0, 10)
-    print server.countWord("fitxeroProva.txt", 0, 10)
+    print mapper1.wordCount(fitxer, 0, contadorLinia/2)
+    print mapper1.countWord(fitxer, 0, contadorLinia/2)
+    print mapper2.wordCount(fitxer, contadorLinia/2, contadorLinia)
+    print mapper2.countWord(fitxer, contadorLinia/2, contadorLinia)
     
     shutdown()

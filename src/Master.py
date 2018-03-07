@@ -87,12 +87,28 @@ class Word(object):
 if __name__ == "__main__":
     set_context()
     host = create_host('http://127.0.0.1:1679')
+    fitxer = "sherlock.txt"
+    contadorLinia = 0
 
-    remote_host = host.lookup_url('http://127.0.0.1:1278/', Host)
+    f = open (fitxer, 'r')
+    contadorLinia = (len(f.readlines()))
+
+    f.close()
+
+    if (contadorLinia %2 ==1):
+        contadorLinia+=1
+
+    remote_host1 = host.lookup_url('http://127.0.0.1:1278/', Host)
+    remote_host2 = host.lookup_url('http://127.0.0.1:1279/', Host)
     #print remote_host
-    mapper1 = remote_host.spawn('mapper1', 'Master/Word')
+    mapper1 = remote_host1.spawn('mapper1', 'Master/Word')
+    mapper2 = remote_host2.spawn('mapper2', 'Master/Word')
+
+
     
-    print mapper1.wordCount("fitxeroProva.txt", 0, 10)
-    print mapper1.countWord("fitxeroProva.txt", 0, 10)
+    print mapper1.wordCount(fitxer, 0, contadorLinia/2)
+    print mapper1.countWord(fitxer, 0, contadorLinia/2)
+    print mapper2.wordCount(fitxer, contadorLinia/2, contadorLinia)
+    print mapper2.countWord(fitxer, contadorLinia/2, contadorLinia)
     
     shutdown()
