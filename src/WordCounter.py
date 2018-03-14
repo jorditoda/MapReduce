@@ -79,3 +79,10 @@ class Word(object):
         f.close()
 
         return diccionari
+
+
+if __name__ == "__main__":
+    set_context()
+
+    h = create_host()
+    e1 = h.spawn('WordC', Word)

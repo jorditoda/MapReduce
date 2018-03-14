@@ -2,8 +2,8 @@ from pyactor.context import set_context, create_host, Host, sleep, shutdown
 from pyactor.exceptions import TimeoutError
 
 class Word(object):
-    _ask = {'wordCount', 'puntuation', 'countWord'}                #sincron
-    #_tell = ['wordCount', 'puntuation', 'countWord']                #asincron
+    #_ask = {'wordCount', 'puntuation', 'countWord'}                #sincron
+    _tell = ['wordCount', 'puntuation', 'countWord']                #asincron
 
     def puntuation(self, paraula):
         paraula = paraula.replace('*','')
@@ -98,30 +98,57 @@ if __name__ == "__main__":
 
     f.close()
 
-    if (contadorLinia %3 ==1):
-        contadorLinia+=2
-    if (contadorLinia %3 ==2):
-        contadorLinia+=1
+    registry = host.lookup_url('http://127.0.0.1:6000/regis', 'RegistryM', 'Registry')
+    registryAll = registry.get_all()
+    totalMappers = len(registryAll)
 
-    remote_host1 = host.lookup_url('http://127.0.0.1:1278/', Host)
+    aux = contadorLinia % totalMappers
+    contadorLinia = contadorLinia + totalMappers - aux
+
+    i = 0;
+
+    for remote_host in registryAll:
+
+        if remote_host is not None:
+            print "mapper :D"
+            print remote_host
+            mapper = remote_host.spawn('mapper1', 'Master/Word')
+            mapper.wordCount(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1))
+            mapper.countWord(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1))
+        i = i+1;
+
+    #sleep(5)
+    print "GOOD NIGHT"
+    shutdown()
+"""
+                server = remote_host.spawn('server', 's4_clientb/Server')
+            else:
+                server = remote_host.lookup('server')
+            z = server.add(6, 7)
+          
+        try:
+            registry.unbind('None')
+        except NotFound:
+            print "Cannot unbind this object: is not in the registry."  
+"""
+
+
+"""    remote_host1 = host.lookup_url('http://127.0.0.1:1278/', Host)
     remote_host2 = host.lookup_url('http://127.0.0.1:1279/', Host)
     remote_host3 = host.lookup_url('http://127.0.0.1:1280/', Host)
     print remote_host1
     mapper1 = remote_host1.spawn('mapper1', 'Master/Word')
     print mapper1
     mapper2 = remote_host2.spawn('mapper2', 'Master/Word')
-    mapper3 = remote_host3.spawn('mapper3', 'Master/Word')
+    mapper3 = remote_host3.spawn('mapper3', 'Master/Word')"""
 
-
-    print mapper1.wordCount(fitxer, 0, contadorLinia/3)
-    print mapper1.countWord(fitxer, 0, contadorLinia/3)
-    print mapper2.wordCount(fitxer, contadorLinia/3, (contadorLinia/3)*2)
-    print mapper2.countWord(fitxer, contadorLinia/3, (contadorLinia/3)*2)
-    print mapper3.wordCount(fitxer, (contadorLinia/3)*2, contadorLinia)
-    print mapper3.countWord(fitxer, (contadorLinia/3)*2, contadorLinia)
+"""
+    print mapper1.wordCount(fitxer, 0, contadorLinia/totalMappers)
+    print mapper1.countWord(fitxer, 0, contadorLinia/totalMappers)
+    print mapper2.wordCount(fitxer, contadorLinia/totalMappers, (contadorLinia/totalMappers)*2)
+    print mapper2.countWord(fitxer, contadorLinia/totalMappers, (contadorLinia/totalMappers)*2)
+    print mapper3.wordCount(fitxer, (contadorLinia/totalMappers)*2, contadorLinia)
+    print mapper3.countWord(fitxer, (contadorLinia/totalMappers)*2, contadorLinia)
    
-
+"""
     #sleep(5)
-    print "he acabat"
-    print "GOOD NIGHT"
-    shutdown()
