@@ -1,9 +1,6 @@
-from pyactor.context import set_context, create_host, Host, sleep, shutdown
-from pyactor.exceptions import TimeoutError
-
 class Word(object):
-    _ask = {'wordCount', 'puntuation', 'countWord'}                #sincron
-    #_tell = ['wordCount', 'puntuation', 'countWord']                #asincron
+    _ask = {''}                #sincron
+    _tell = ['wordCount', 'puntuation', 'countWord']                #asincron
 
     def puntuation(self, paraula):
         paraula = paraula.replace('*','')
@@ -31,7 +28,6 @@ class Word(object):
         
         contador = 0
         contadorLinia = 0
-        print "he entrat :D"
 
         for line in f:
             if (contadorLinia >= inici and contadorLinia < fi):
@@ -48,7 +44,6 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        print contador
 
         return contador
 
@@ -82,46 +77,5 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        print "he sortir del countword"
+
         return diccionari
-
-
-
-if __name__ == "__main__":
-    set_context()
-    host = create_host('http://127.0.0.1:1679')
-    fitxer = "sherlock.txt"
-    contadorLinia = 0
-
-    f = open (fitxer, 'r')
-    contadorLinia = (len(f.readlines()))
-
-    f.close()
-
-    if (contadorLinia %3 ==1):
-        contadorLinia+=2
-    if (contadorLinia %3 ==2):
-        contadorLinia+=1
-
-    remote_host1 = host.lookup_url('http://127.0.0.1:1278/', Host)
-    remote_host2 = host.lookup_url('http://127.0.0.1:1279/', Host)
-    remote_host3 = host.lookup_url('http://127.0.0.1:1280/', Host)
-    print remote_host1
-    mapper1 = remote_host1.spawn('mapper1', 'Master/Word')
-    print mapper1
-    mapper2 = remote_host2.spawn('mapper2', 'Master/Word')
-    mapper3 = remote_host3.spawn('mapper3', 'Master/Word')
-
-
-    print mapper1.wordCount(fitxer, 0, contadorLinia/3)
-    print mapper1.countWord(fitxer, 0, contadorLinia/3)
-    print mapper2.wordCount(fitxer, contadorLinia/3, (contadorLinia/3)*2)
-    print mapper2.countWord(fitxer, contadorLinia/3, (contadorLinia/3)*2)
-    print mapper3.wordCount(fitxer, (contadorLinia/3)*2, contadorLinia)
-    print mapper3.countWord(fitxer, (contadorLinia/3)*2, contadorLinia)
-   
-
-    #sleep(5)
-    print "he acabat"
-    print "GOOD NIGHT"
-    shutdown()
