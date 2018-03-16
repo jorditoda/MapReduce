@@ -2,8 +2,16 @@ from pyactor.context import set_context, create_host, Host, sleep, shutdown
 from pyactor.exceptions import TimeoutError
 
 class Word(object):
-    #_ask = {'wordCount', 'puntuation', 'countWord'}                #sincron
-    _tell = ['wordCount', 'puntuation', 'countWord']                #asincron
+    #_ask = {'wordCount', 'countWord'}                #sincron
+    _tell = ['wordCount', 'countWord', 'reduceW', 'reduceC']                #asincron
+    _ref = ['wordCount', 'countWord', 'reduceW', 'reduceC'] 
+
+    def reduceW():
+
+        return d
+    def reduceC(self, contador):
+
+        return contador
 
     def puntuation(self, paraula):
         paraula = paraula.replace('*','')
@@ -26,7 +34,7 @@ class Word(object):
         paraula = paraula.replace('/',' ')
         return paraula.lower()
 
-    def wordCount(self, fitxer, inici, fi):
+    def wordCount(self, fitxer, inici, fi, reducet):
         f = open (fitxer)
         
         contador = 0
@@ -48,8 +56,9 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        print contador
 
+        r = reducet.spawn('Reducer', 'Master/Word')
+        print r.reduceC(contador)
         return contador
 
     def add(self, paraula, diccionari):
@@ -61,7 +70,7 @@ class Word(object):
 
         return diccionari
 
-    def countWord(self, fitxer, inici, fi):
+    def countWord(self, fitxer, inici, fi, red):
         f = open (fitxer)
         diccionari = {}
         
@@ -82,6 +91,8 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
+        r = reducet.spawn('Reducer', 'Master/Word')
+        print r.reduceW(diccionari)
         print "he sortir del countword"
         return diccionari
 
@@ -99,8 +110,10 @@ if __name__ == "__main__":
     f.close()
 
     registry = host.lookup_url('http://127.0.0.1:6000/regis', 'RegistryM', 'Registry')
-    registryAll = registry.get_all()
-    totalMappers = len(registryAll)
+    reducer = registry.lookup("Reduce")                  #agafem url reduce del registry
+    registry.unbind("Reduce")                           #l'eliminem delr egistri per a que no molesti al for
+    registryAll = registry.get_all()                    #agafem tots els altres
+    totalMappers = len(registryAll)                     #mirem quants n'hi ha per dividir el fitxer
 
     aux = contadorLinia % totalMappers
     contadorLinia = contadorLinia + totalMappers - aux
@@ -110,11 +123,10 @@ if __name__ == "__main__":
     for remote_host in registryAll:
 
         if remote_host is not None:
-            print "mapper :D"
             print remote_host
-            mapper = remote_host.spawn('mapper1', 'Master/Word')
-            mapper.wordCount(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1))
-            mapper.countWord(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1))
+            mapper = remote_host.spawn('mapper', 'Master/Word')
+            mapper.wordCount(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), reducer)
+            mapper.countWord(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), reducer)
         i = i+1;
 
     #sleep(5)

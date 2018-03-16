@@ -1,3 +1,5 @@
+from pyactor.context import set_context, create_host, sleep, shutdown
+
 class Word(object):
     _ask = {''}                #sincron
     _tell = ['wordCount', 'puntuation', 'countWord']                #asincron
