@@ -1,17 +1,43 @@
-from pyactor.context import set_context, create_host, Host, sleep, shutdown
+from pyactor.context import set_context, create_host, Host, sleep, shutdown, serve_forever
 from pyactor.exceptions import TimeoutError
 
 class Word(object):
     #_ask = {'wordCount', 'countWord'}                #sincron
-    _tell = ['wordCount', 'countWord', 'reduceW', 'reduceC']                #asincron
+    _tell = ['wordCount', 'countWord', 'reduceW', 'reduceC','echi']                #asincron
     _ref = ['wordCount', 'countWord', 'reduceW', 'reduceC'] 
 
-    def reduceW():
+    contadorMappers = 0
+    contadorMappersW = 0
+    w = 0
+    dicc = {}
 
-        return d
-    def reduceC(self, contador):
+    def echi(self, string):
+        print string
 
-        return contador
+    def reduceW(self, d, m, numMap):
+
+        self.contadorMappersW+=1
+        print "jo el d "
+        print d
+        #self.dicc.append(d)
+        #self.dicc.update(d)
+        print " jo soc el dicc  :DD"
+        #self.dicc = {key: math.fsum(value) for key, value in d.items()}
+        #for key, value in d.items():
+            #self.dicc[key] = sum(value)
+
+        print self.dicc
+
+        if(self.contadorMappersW == numMap):          #aquest numero l'han de passar
+            m.echi(self.dicc)
+
+    def reduceC(self, words, m, numMap):
+
+        self.contadorMappers+=1
+        self.w = self.w + words
+
+        if(self.contadorMappers == numMap):          #aquest numero l'han de passar
+            m.echi(self.w) 
 
     def puntuation(self, paraula):
         paraula = paraula.replace('*','')
@@ -34,12 +60,11 @@ class Word(object):
         paraula = paraula.replace('/',' ')
         return paraula.lower()
 
-    def wordCount(self, fitxer, inici, fi, reducet):
+    def wordCount(self, fitxer, inici, fi, r, host, numMapper):
         f = open (fitxer)
         
         contador = 0
         contadorLinia = 0
-        print "he entrat :D"
 
         for line in f:
             if (contadorLinia >= inici and contadorLinia < fi):
@@ -56,10 +81,8 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-
-        r = reducet.spawn('Reducer', 'Master/Word')
-        print r.reduceC(contador)
-        return contador
+        
+        r.reduceC(contador, host, numMapper)
 
     def add(self, paraula, diccionari):
         if (paraula not in diccionari):
@@ -70,10 +93,10 @@ class Word(object):
 
         return diccionari
 
-    def countWord(self, fitxer, inici, fi, red):
+    def countWord(self, fitxer, inici, fi, r, host, numMapper):
         f = open (fitxer)
         diccionari = {}
-        
+        ''
         contadorLinia = 0
 
         for line in f:
@@ -91,10 +114,7 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        r = reducet.spawn('Reducer', 'Master/Word')
-        print r.reduceW(diccionari)
-        print "he sortir del countword"
-        return diccionari
+        r.reduceW(diccionari, host, numMapper)
 
 
 
@@ -113,10 +133,14 @@ if __name__ == "__main__":
     reducer = registry.lookup("Reduce")                  #agafem url reduce del registry
     registry.unbind("Reduce")                           #l'eliminem delr egistri per a que no molesti al for
     registryAll = registry.get_all()                    #agafem tots els altres
+
     totalMappers = len(registryAll)                     #mirem quants n'hi ha per dividir el fitxer
 
     aux = contadorLinia % totalMappers
     contadorLinia = contadorLinia + totalMappers - aux
+
+    r = reducer.spawn('Reducer', 'Master/Word')
+    h = host.spawn('Master', 'Master/Word')
 
     i = 0;
 
@@ -125,42 +149,11 @@ if __name__ == "__main__":
         if remote_host is not None:
             print remote_host
             mapper = remote_host.spawn('mapper', 'Master/Word')
-            mapper.wordCount(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), reducer)
-            mapper.countWord(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), reducer)
+            mapper.wordCount(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), r, h, totalMappers)
+            mapper.countWord(fitxer, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), r, h, totalMappers)
         i = i+1;
 
     #sleep(5)
     print "GOOD NIGHT"
-    shutdown()
-"""
-                server = remote_host.spawn('server', 's4_clientb/Server')
-            else:
-                server = remote_host.lookup('server')
-            z = server.add(6, 7)
-          
-        try:
-            registry.unbind('None')
-        except NotFound:
-            print "Cannot unbind this object: is not in the registry."  
-"""
-
-
-"""    remote_host1 = host.lookup_url('http://127.0.0.1:1278/', Host)
-    remote_host2 = host.lookup_url('http://127.0.0.1:1279/', Host)
-    remote_host3 = host.lookup_url('http://127.0.0.1:1280/', Host)
-    print remote_host1
-    mapper1 = remote_host1.spawn('mapper1', 'Master/Word')
-    print mapper1
-    mapper2 = remote_host2.spawn('mapper2', 'Master/Word')
-    mapper3 = remote_host3.spawn('mapper3', 'Master/Word')"""
-
-"""
-    print mapper1.wordCount(fitxer, 0, contadorLinia/totalMappers)
-    print mapper1.countWord(fitxer, 0, contadorLinia/totalMappers)
-    print mapper2.wordCount(fitxer, contadorLinia/totalMappers, (contadorLinia/totalMappers)*2)
-    print mapper2.countWord(fitxer, contadorLinia/totalMappers, (contadorLinia/totalMappers)*2)
-    print mapper3.wordCount(fitxer, (contadorLinia/totalMappers)*2, contadorLinia)
-    print mapper3.countWord(fitxer, (contadorLinia/totalMappers)*2, contadorLinia)
-   
-"""
-    #sleep(5)
+    serve_forever()
+    #shutdown()

@@ -2,4 +2,6 @@ soc un Fitxer         'te de text. que te
 un text .dins del -fitxer_--fitxer
 estic fins--..,-- _ exemple
 á
-asde fgsa
+asde fgsa fitxer
+fotxer
+fitxer
