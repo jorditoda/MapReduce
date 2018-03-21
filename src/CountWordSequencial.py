@@ -29,9 +29,9 @@ def add(paraula):
 
 if __name__ == "__main__":
 
-    f = open ("sherlock.txt")
+    #f = open ("sherlock2.txt")
     #f = open ("Quijote.txt")
-    #f = open ("bible.txt")
+    f = open ("bible2.txt")
     #f = open ("fitxeroProva.txt")
     diccionari = {}
 

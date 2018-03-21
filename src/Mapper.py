@@ -6,6 +6,7 @@ if __name__ == "__main__":
     registry = host.lookup_url('http://127.0.0.1:6000/regis', 'RegistryM', 'Registry')
 
     registry.bind('Mapper1', host)
+    print "Mapper serving"
     serve_forever()
 
 
