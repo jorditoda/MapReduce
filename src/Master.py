@@ -9,7 +9,7 @@ if __name__ == "__main__":
     set_context()
     host = create_host('http://127.0.0.1:1600')
     
-    url = "http://127.0.0.1:8000/sherlock2.txt"
+    url = "http://127.0.0.1:8000/sherlock.txt"
     filename = url[url.rfind("/") +1 :]
 
     if(path.exists(filename) != True):
