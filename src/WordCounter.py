@@ -32,7 +32,6 @@ class Word(object):
     
         if(self.contadorMappersW == numMap): 
             elapsed = (time.time() - now)  
-            print now
             m.echo(self.dicc)  
             m.echo("Temps emprat amb diccionari:")
             m.echo(elapsed) 
@@ -43,8 +42,7 @@ class Word(object):
         self.w = self.w + words
 
         if(self.contadorMappers == numMap): 
-            elapsed = (time.time() - now)  
-            print now    
+            elapsed = (time.time() - now) 
             m.echo("Numero paraules: ")     
             m.echo(self.w) 
             m.echo("Temps emprat contant:")
