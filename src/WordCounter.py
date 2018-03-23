@@ -1,16 +1,16 @@
 from pyactor.context import set_context, create_host, sleep, shutdown
-from urllib import urlopen
 import time
+import os
+import os.path as path
 
 class Word(object):
-    _tell = ['wordCount', 'countWord', 'reduceW', 'reduceC','echi']                #asincron
+    _tell = ['wordCount', 'countWord', 'reduceW', 'reduceC','echo']                #asincron
     _ref = ['wordCount', 'countWord', 'reduceW', 'reduceC'] 
 
     contadorMappers = 0
     contadorMappersW = 0
     w = 0
     dicc = {}
-    now = 0
 
     def addR(self, paraula, diccionari, value):
         if (paraula not in diccionari):
@@ -21,29 +21,34 @@ class Word(object):
 
         return diccionari
 
-    def echi(self, string):
+    def echo(self, string):
         print string
 
-    def reduceW(self, d, m, numMap):
+    def reduceW(self, d, m, numMap, now):
 
         self.contadorMappersW+=1
         for key, value in d.items():
             self.addR(key, self.dicc, value)
     
         if(self.contadorMappersW == numMap): 
-            elapsed = (time.time() - self.now)/100000000   
-            m.echi(self.dicc)  
-            m.echi("Temps emprat:")
-            m.echi(elapsed) 
+            elapsed = (time.time() - now)  
+            print now
+            m.echo(self.dicc)  
+            m.echo("Temps emprat amb diccionari:")
+            m.echo(elapsed) 
 
-    def reduceC(self, words, m, numMap):
+    def reduceC(self, words, m, numMap, now):
 
         self.contadorMappers+=1
         self.w = self.w + words
 
-        if(self.contadorMappers == numMap):     
-            m.echi("Numero paraules: ")     
-            m.echi(self.w) 
+        if(self.contadorMappers == numMap): 
+            elapsed = (time.time() - now)  
+            print now    
+            m.echo("Numero paraules: ")     
+            m.echo(self.w) 
+            m.echo("Temps emprat contant:")
+            m.echo(elapsed) 
 
     def puntuation(self, paraula):
         paraula = paraula.replace('*','')
@@ -66,13 +71,14 @@ class Word(object):
         paraula = paraula.replace('/',' ')
         return paraula.lower()
 
-    def wordCount(self, url, inici, fi, r, host, numMapper):
-        
-        self.now = time.time()
-        fitxer = urlopen(url)
-        filename = url[url.rfind("/") +1 :]
+    def wordCount(self, url, inici, fi, r, host, numMapper, now):
 
-        f = open (filename)
+        filename = url[url.rfind("/") +1 :]
+        
+        if(path.exists(filename) != True):
+            os.system("curl -O "+url)
+
+        f = open(filename)
 
         print "fitxer obert"
         
@@ -94,8 +100,8 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        
-        r.reduceC(contador, host, numMapper)
+        #os.system("rm "+filename)
+        r.reduceC(contador, host, numMapper, now)
 
     def add(self, paraula, diccionari):
         if (paraula not in diccionari):
@@ -106,15 +112,17 @@ class Word(object):
 
         return diccionari
 
-    def countWord(self, url, inici, fi, r, host, numMapper):
+    def countWord(self, url, inici, fi, r, host, numMapper, now):
 
-        fitxer = urlopen(url)
         filename = url[url.rfind("/") +1 :]
+
+        if(path.exists(filename) != True):
+            os.system("curl -O "+url)
 
         f = open(filename)
         
         diccionari = {}
-        ''
+        
         contadorLinia = 0
 
         for line in f:
@@ -132,7 +140,8 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        r.reduceW(diccionari, host, numMapper)
+        #os.system("rm "+filename)
+        r.reduceW(diccionari, host, numMapper, now)
 
 
 if __name__ == "__main__":
