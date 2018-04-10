@@ -3,8 +3,6 @@
 This is a simple project example on github using the
 [MapReduce](https://github.com/jorditoda/MapReduce) library.
 
-[![Build Status](https://travis-ci.org/jorditoda/MapReduce.svg?branch=master)](https://travis-ci.org/jorditoda/MapReduce)
-
 ## Installing PyActor
 
 Packages required:
