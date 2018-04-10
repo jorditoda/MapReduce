@@ -104,6 +104,7 @@ Then, add a .rst file on the docs directory with the text you want. Reference th
 	speedup CW: 2,26
 
 -**bible2.txt(8,9MB):**
+
 	WordCounterSequencial: 40,33s
 	CountWordSequencial: 43,87s
 
