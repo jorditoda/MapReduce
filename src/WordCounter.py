@@ -5,7 +5,7 @@ import os.path as path
 
 class Word(object):
     _tell = ['wordCount', 'countWord', 'reduceW', 'reduceC','echo']                #asincron
-    _ref = ['wordCount', 'countWord', 'reduceW', 'reduceC'] 
+    _ref = ['wordCount', 'countWord', 'reduceW', 'reduceC']
 
     contadorMappers = 0
     contadorMappersW = 0
@@ -29,24 +29,24 @@ class Word(object):
         self.contadorMappersW+=1
         for key, value in d.items():
             self.addR(key, self.dicc, value)
-    
-        if(self.contadorMappersW == numMap): 
-            elapsed = (time.time() - now)  
-            m.echo(self.dicc)  
+
+        if(self.contadorMappersW == numMap):
+            elapsed = (time.time() - now)
+            m.echo(self.dicc)
             m.echo("Temps emprat amb diccionari:")
-            m.echo(elapsed) 
+            m.echo(elapsed)
 
     def reduceC(self, words, m, numMap, now):
 
         self.contadorMappers+=1
         self.w = self.w + words
 
-        if(self.contadorMappers == numMap): 
-            elapsed = (time.time() - now) 
-            m.echo("Numero paraules: ")     
-            m.echo(self.w) 
+        if(self.contadorMappers == numMap):
+            elapsed = (time.time() - now)
+            m.echo("Numero paraules: ")
+            m.echo(self.w)
             m.echo("Temps emprat contant:")
-            m.echo(elapsed) 
+            m.echo(elapsed)
 
     def puntuation(self, paraula):
         paraula = paraula.replace('*','')
@@ -72,14 +72,14 @@ class Word(object):
     def wordCount(self, url, inici, fi, r, host, numMapper, now):
 
         filename = url[url.rfind("/") +1 :]
-        
+
         if(path.exists(filename) != True):
             os.system("curl -O "+url)
 
         f = open(filename)
 
         print "fitxer obert"
-        
+
         contador = 0
         contadorLinia = 0
 
@@ -88,7 +88,7 @@ class Word(object):
 
                 for paraula in line.split():
                     paraula = self.puntuation(paraula)
-                
+
                     if(paraula.find(" ")>=0):
                         for p in paraula.split():
                             contador+=1
@@ -98,7 +98,6 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        #os.system("rm "+filename)
         r.reduceC(contador, host, numMapper, now)
 
     def add(self, paraula, diccionari):
@@ -118,9 +117,9 @@ class Word(object):
             os.system("curl -O "+url)
 
         f = open(filename)
-        
+
         diccionari = {}
-        
+
         contadorLinia = 0
 
         for line in f:
@@ -128,7 +127,7 @@ class Word(object):
 
                 for paraula in line.split():
                     paraula = self.puntuation(paraula)
-                
+
                     if(paraula.find(" ")>=0):
                         for p in paraula.split():
                             diccionari = self.add(p, diccionari)
@@ -138,12 +137,9 @@ class Word(object):
 
             contadorLinia +=1
         f.close()
-        #os.system("rm "+filename)
+
         r.reduceW(diccionari, host, numMapper, now)
 
 
 if __name__ == "__main__":
     set_context()
-
-    h = create_host()
-    e1 = h.spawn('WordC', Word)
