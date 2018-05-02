@@ -6,9 +6,9 @@ gnome-terminal -e "python Registry.py"
 
 gnome-terminal -e "python Mapper.py"
 gnome-terminal -e "python Mapper2.py"
-gnome-terminal -e "python Mapper3.py"
-gnome-terminal -e "python Mapper4.py"
-gnome-terminal -e "python Mapper5.py"
+#gnome-terminal -e "python Mapper3.py"
+#gnome-terminal -e "python Mapper4.py"
+#gnome-terminal -e "python Mapper5.py"
 
 gnome-terminal -e "python Reduce.py"
 

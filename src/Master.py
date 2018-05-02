@@ -31,20 +31,35 @@ if __name__ == "__main__":
     aux = contadorLinia % totalMappers
     contadorLinia = contadorLinia + totalMappers - aux      #per que sigui multiple
 
-    r = reducer.spawn('Reducer', 'WordCounter/Word')
-    h = host.spawn('Master', 'WordCounter/Word')
+    r = reducer.spawn('Reducer', 'ReduceMapper/Word')
+    h = host.spawn('Master', 'Echo/Word')
 
     i = 0;
 
-    print "Esperant Mappers..."
+    print "Esperant Mappers per contar paraules..."
+
+    t = time.time()
 
     for remote_host in registryAll:
 
         if remote_host is not None:
             print remote_host
-            mapper = remote_host.spawn('mapper', 'WordCounter/Word')
-            mapper.wordCount(url, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), r, h, totalMappers, time.time())
-            mapper.countWord(url, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), r, h, totalMappers, time.time())
+            mapper = remote_host.spawn('mapperW', 'WordCount/Word')
+            mapper.wordCount(url, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), r, h, totalMappers, t)
+        i = i+1;
+
+    i=0
+
+    raw_input()
+
+    t = time.time()
+ 
+    for remote_host in registryAll:
+
+        if remote_host is not None:
+            print remote_host
+            mapper = remote_host.spawn('mapperC', 'CountWord/Word')
+            mapper.countWord(url, (contadorLinia/totalMappers)*i, (contadorLinia/totalMappers)*(i+1), r, h, totalMappers, t)
         i = i+1;
   
   #wait until Reduce finishes
