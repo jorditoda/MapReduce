@@ -3,6 +3,11 @@
 This is a simple project example on github using the
 [MapReduce](https://github.com/jorditoda/MapReduce) library.
 
+[![Build Status](https://travis-ci.org/jorditoda/MapReduce.svg?branch=master)](https://travis-ci.org/jorditoda/MapReduce)
+[![codecov](https://codecov.io/gh/jorditoda/MapReduce/branch/master/graph/badge.svg)](https://codecov.io/gh/jorditoda/MapReduce)
+[![Code Health](https://landscape.io/github/jorditoda/MapReduce/master/landscape.svg?style=flat)](https://landscape.io/github/jorditoda/MapReduce/master)
+
+
 ## Installing PyActor
 
 Packages required:
